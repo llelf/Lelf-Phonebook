@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <style type="text/css">
+      @import 'ass/css/bootstrap.min.css';
+      @import 'ass/css/bootstrap-responsive.min.css';
+
+      body { padding-top: 90px }
+    </style>
+
+    <script src="ass/js/jquery-1.9.1.min.js" type="text/javascript"></script>
+    <script src="ass/js/bootstrap.min.js" type="text/javascript"></script>
+    <script src="ass/js/knockout-2.2.1.js" type="text/javascript"></script>
+    <script src="ass/js/knockout.mapping-latest.debug.js" type="text/javascript"></script>
+    <script src="core.js" type="text/javascript"></script>
+    <script src="ui.js" type="text/javascript"></script>
+  </head>
+
+  <body style="">
+
+    <div id="main" class="container">
+
+      <div class="container" style="width:15cm">
+
+      <div class="navbar navbar-reverse">
+	<div class="navbar-inner">
+	  <a class="brand" href="#"><p class="navbar-text">Phonebook</p></a>
+	</div>
+      </div>
+
+      <div class="row-fluid">
+
+	<!-- * List pane -->
+	<div id="list-pane" class="span4">
+	  <ul class="nav nav-list" data-bind="foreach: people">
+	    <li data-bind="css: {active: $root.currentPerson().id() == $data.id()}">
+	      <a data-bind="text: name, click: $root.select"></a>
+	    </li>
+	  </ul>
+
+	  <form class="well">
+	    <div class="controls"><input type="text" class="input-block-level"/></div>
+	    <div class="controls"><a class="btn"><i class="icon-pencil"></i>create</a></div>
+	  </form>
+	</div>
+	
+	<!-- * Info pane -->
+	<div id="info-pane" class="span8">
+
+	  <!-- view -->
+	  <form class="info-tmpl well"
+		data-bind="with: currentPerson, visible: info.state()=='view'">
+	    <h1 class=""><span data-bind="text: name"></span></h1>
+	    <div class="btn-group btn-group-vertical"
+		 data-bind="foreach: phones">
+	      <span class="btn" data-bind="text: number"></span>
+	    </div>
+	    <div class="form-actions controls controls-row">
+	      <a class="btn" data-bind="click: $root.info.goEdit"><i class="icon-edit"></i> Edit?</a>
+	    </div>
+	  </form>
+
+	  <!-- edit -->
+	  <form class="well edit-info-tmpl"
+		data-bind="with: currentPerson, visible: info.state()=='edit'">
+	    <input class="input-block-level" type="text"
+		   data-bind="value: name"/>
+	    <div class="well">
+	      <div data-bind="foreach: phones">
+		<div class="controls controls-row">
+		  <span class="btn span8" data-bind="text: number"></span>
+		  <button class="btn btn-danger span2"
+			  data-bind="click: $root.info.delPhone">
+		    <i class="icon-remove"></i>
+		  </button>
+		</div>
+	      </div>
+	      
+	      <p class="controls"></p>
+
+	      <div class="controls controls-row" data-bind="with: $parent.info.newPhone">
+		<input class="span8" type="text" data-bind="value: number" placeholder="3-14-159-2653..."/>
+		<button class="btn span2" data-bind="click: $root.info.addPhone">
+		  <i class="icon-plus"></i>
+		</button>
+	      </div>
+	    </div>
+
+	    <div class="form-actions">
+	      <button class="btn" data-bind="click: $root.info.editDone">Done <i class="icon-ok"></i></button>
+	      <button class="btn pull-right btn-danger"
+		      data-bind="click: $root.delPerson">
+		<i class="icon-fire icon-white"></i>
+	      </button>
+	    </div>
+
+	  </form>
+	</div>
+      </div>
+      </div>
+    </div>
+  </body>
+</html>
+
