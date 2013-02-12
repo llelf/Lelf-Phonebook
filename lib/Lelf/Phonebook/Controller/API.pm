@@ -38,7 +38,13 @@ before end => sub {
 
 sub people :Local :ActionClass('REST') {
   my ($self, $c) = @_;
-  $self->action_for('')->attributes;
+
+  my $act = $self->action_for($c->action->name . '_' . $c->request->method);
+  my $validate = $act && $act->attributes->{Validate};
+
+  if ($validate) {
+      # do smth already or detach('end')
+  }
 }
 
 
