@@ -12,6 +12,9 @@ sub auto :Private {
     my ($self, $c) = @_;
 
     $c->stash(book => $c->model('Phonebook'));
+
+    my $act = $self->action_for($c->action->name . '_' . $c->request->method);
+    $act // $->stash(action_attrs => $act->attributes);
 }
 
 
@@ -36,13 +39,11 @@ before end => sub {
 
 
 
+
 sub people :Local :ActionClass('REST') {
   my ($self, $c) = @_;
 
-  my $act = $self->action_for($c->action->name . '_' . $c->request->method);
-  my $validate = $act && $act->attributes->{Validate};
-
-  if ($validate) {
+  if ($c->{stash}{action_attrs}{Validate}) {
       # do smth already or detach('end')
   }
 }
