@@ -10,7 +10,7 @@ extends 'DBIx::Class::Core';
 use DBIx::Class::MooseColumns;
 
 __PACKAGE__->table('phonebook');
-
+__PACKAGE__->load_components('InflateColumn::Serializer', 'Core');
 
 has id => (isa => 'Int', is => 'rw', add_column => { is_auto_increment => 1 });
 
@@ -26,7 +26,7 @@ has name => (
 has phones => (
     isa => 'ArrayRef[Str]',
     is => 'rw',
-    add_column => { data_type => 'text' }
+    add_column => { data_type => 'text', serializer_class => 'JSON' }
 );
 
 
