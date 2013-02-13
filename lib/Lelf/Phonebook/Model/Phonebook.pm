@@ -7,6 +7,7 @@ use Moose;
 use namespace::autoclean;
 use MooseX::NonMoose;
 
+
 __PACKAGE__->config(
     schema_class => 'Lelf::Phonebook::Schema::Phonebook',
     
@@ -19,42 +20,41 @@ __PACKAGE__->config(
 
 
 
+sub ppl { $_[0]->resultset('Phonebook') }
+
+
 
 sub valid_person {
   my ($p) = @_;
-
-  #(sort keys %$p) ~~ (sort qw{id name phones}) or return 0;
-  
   return 1;
 }
 
 sub people_names {
     my ($self) = @_;
 
-    return $self->resultset('Phonebook')->search({}, { columns => [qw{id name}] })->all;
+    return $self->ppl->search({}, { columns => [qw{id name}] })->all;
 }
 
-sub update_person {
-    
+
+sub find_person {
+  my ($self, $id) = @_;
+  $self->ppl->find($id);
 }
 
 sub create_person {
   my ($self, $p) = @_;
-
-  return undef unless valid_person($p);
-
-  my $created = $self->resultset('Phonebook')->create($p);
-
-  return $created;
+  eval { $self->ppl->create($p) };
 }
 
-sub find_person {
-    my ($self, $id) = @_;
-
-    my $o = $self->resultset('Phonebook')->find($id);
-
+sub update_person {
+  my ($self, $p) = @_;
+  eval { $self->ppl->find($p->{id})->update($p) };
 }
 
+sub delete_person {
+  my ($self, $id) = @_;
+  eval { $self->ppl->delete($id) };
+}
 
 
 
