@@ -13,9 +13,7 @@ __PACKAGE__->config(namespace => '');
 
 sub index :Path :Args(0) {
     my ( $self, $c ) = @_;
-
-    # Hello World
-    $c->response->body('No-no-no, use should see index.html');
+    $c->serve_static_file('root/index.html');
 }
 
 =head2 default
