@@ -18,6 +18,15 @@ requires 'Moose';
 requires 'namespace::autoclean';
 requires 'Config::General'; # This should reflect the config file format you've chosen
                  # See Catalyst::Plugin::ConfigLoader for supported formats
+requires 'Modern::Perl';
+requires 'CatalystX::Controller::Sugar';
+requires 'Catalyst::Controller::REST';
+requires 'Syntax::Feature::CatalystAction';
+requires 'Syntax::Feature::Method';
+requires 'MooseX::NonMoose';
+requires 'MooseX::MarkAsMethods';
+requires 'DBIx::Class::MooseColumns';
+requires 'DBIx::Class::InflateColumn::Serializer';
 test_requires 'Test::More' => '0.88';
 catalyst;
 
