@@ -3,9 +3,8 @@
 /// <reference path="knockout.mapping.d.ts" />
 /// <reference path="core.ts" />
 
-
 declare var phone: (string) => any;
-
+var ui;
 var api;
 
 class Info
@@ -13,32 +12,28 @@ class Info
   newPhone = ko.observable(phone(''));
 
   changeState: () => void;
-  state = ko.observable('view');
+  state = ko.observable('?');
   goEdit: () => void;
   delPhone;
   addPhone;
   editDone;
 
   constructor (view) {
-
-    this.goEdit = () => {
-      this.state('edit');
-    }
+    this.goEdit = () => { this.state('edit') };
 
     this.delPhone = (p: Phone) => {
-      view.currentPerson().phones.remove(p);
+      view.currentPerson.phones.remove(p);
     }
 
     this.addPhone = (_: Phone) => {
-      view.currentPerson().phones.push(this.newPhone());
-      this.newPhone('');
+      view.currentPerson.phones.push(this.newPhone());
+      this.newPhone(phone(''));
     }
 
     this.editDone = (p) => {
-      api.update_person(p); 
+      api.update_person(ko.mapping.toJS(p));
       view.sync();
       view.select(p);
-      console.log('done?');
     };
   }
 }
@@ -46,7 +41,8 @@ class Info
 class View
 {
   people = ko.mapping.fromJS(api.person_list());
-  currentPerson = ko.observable();
+  currentPerson = ko.mapping.fromJS(new Person(-1,'',[]));
+  newPerson = ko.mapping.fromJS(new Person(-1,'',[]));
 
   select;
   addPerson;
@@ -54,29 +50,41 @@ class View
 
   info: Info;
 
-  sync () { console.log('sync'); ko.mapping.fromJS(api.person_list(), this.people); }
+  sync () {
+    console.log('sync');
+    ko.mapping.fromJS(api.person_list(), this.people);
+  }
 
+  selectFirst () {
+    if (this.people().length > 0)
+      this.select(this.people()[0]);
+  }
 
   constructor
   {
-    console.log(api.person_list());
+    this.info = new Info(this);
 
     this.select = (p) => {
       var editable = ko.mapping.toJS(p);
-      this.currentPerson(ko.mapping.fromJS(editable));
-      this.info = new Info(this);
+      ko.mapping.fromJS(editable, this.currentPerson);
+      this.info.state('view');
     };
 
     this.addPerson = (p) => {
+      var np = api.create_person(ko.mapping.toJS(p));
+      p.name('');
+      this.sync();
+      this.select(ko.mapping.fromJS(np));
     }
 
     this.delPerson = (p) => {
-      console.log('del', p);
-      api.delete_person(p.id);
+      api.delete_person(ko.mapping.toJS(p));
+      this.info.state('?');
+      this.sync();
+      this.selectFirst();
     }
 
-    if (this.people().length > 0)
-      this.select(this.people()[0]);
+    this.selectFirst();
   }
 }
 
@@ -86,11 +94,12 @@ class UI
   constructor
   {
     api = new AjaxAPI();
-    console.log('~', api.person_list());
-    ko.applyBindings(new View());
+    ko.applyBindings(view = new View());
   }
 }
 
 
-$(() => new UI());
+var view: View;
+
+$(() => { new UI() });
 

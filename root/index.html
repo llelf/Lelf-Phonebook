@@ -34,19 +34,31 @@
 	<!-- * List pane -->
 	<div id="list-pane" class="span4">
 	  <ul class="nav nav-list" data-bind="foreach: people">
-	    <li data-bind="css: {active: $root.currentPerson().id() == $data.id()}">
+	    <li data-bind="css: {active: $root.currentPerson.id() == $data.id()}">
 	      <a data-bind="text: name, click: $root.select"></a>
 	    </li>
 	  </ul>
 
-	  <form class="well">
-	    <div class="controls"><input type="text" class="input-block-level"/></div>
-	    <div class="controls"><a class="btn"><i class="icon-pencil"></i>create</a></div>
+	  <form class="well" data-bind="with: newPerson">
+	    <div class="controls">
+	      <input type="text" class="input-block-level"
+		     data-bind="value: name"/>
+	    </div>
+	    <div class="controls">
+	      <a class="btn" data-bind="click: $root.addPerson">
+		<i class="icon-pencil"></i>create
+	    </a>
+	    </div>
 	  </form>
 	</div>
 	
 	<!-- * Info pane -->
 	<div id="info-pane" class="span8">
+
+	  <div class="well"
+	       data-bind="visible: $root.people().length == 0">
+	    create some
+	  </div>
 
 	  <!-- view -->
 	  <form class="info-tmpl well"
