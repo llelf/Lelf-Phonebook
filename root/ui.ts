@@ -9,7 +9,7 @@ var api;
 
 class Info
 {
-  newPhone = ko.observable(phone(''));
+  newPhone = ko.mapping.fromJS(phone(''));
 
   changeState: () => void;
   state = ko.observable('?');
@@ -26,8 +26,8 @@ class Info
     }
 
     this.addPhone = (_: Phone) => {
-      view.currentPerson.phones.push(this.newPhone());
-      this.newPhone(phone(''));
+      view.currentPerson.phones.push(ko.toJS(this.newPhone));
+      this.newPhone.number('');
     }
 
     this.editDone = (p) => {

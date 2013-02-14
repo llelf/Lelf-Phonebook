@@ -3,7 +3,7 @@ var api;
 var Info = (function () {
     function Info(view) {
         var _this = this;
-        this.newPhone = ko.observable(phone(''));
+        this.newPhone = ko.mapping.fromJS(phone(''));
         this.state = ko.observable('?');
         this.goEdit = function () {
             _this.state('edit');
@@ -12,8 +12,8 @@ var Info = (function () {
             view.currentPerson.phones.remove(p);
         };
         this.addPhone = function (_) {
-            view.currentPerson.phones.push(_this.newPhone());
-            _this.newPhone(phone(''));
+            view.currentPerson.phones.push(ko.toJS(_this.newPhone));
+            _this.newPhone.number('');
         };
         this.editDone = function (p) {
             api.update_person(ko.mapping.toJS(p));

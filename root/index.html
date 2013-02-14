@@ -42,12 +42,12 @@
 	  <form class="well" data-bind="with: newPerson">
 	    <div class="controls">
 	      <input type="text" class="input-block-level"
-		     data-bind="value: name"/>
+		     data-bind="value: name, valueUpdate: 'keyup'"/>
 	    </div>
 	    <div class="controls">
-	      <a class="btn" data-bind="click: $root.addPerson">
+	      <button class="btn" data-bind="click: $root.addPerson, enable: name().length>0">
 		<i class="icon-pencil"></i>create
-	    </a>
+	      </button>
 	    </div>
 	  </form>
 	</div>
@@ -77,7 +77,7 @@
 	  <form class="well edit-info-tmpl"
 		data-bind="with: currentPerson, visible: info.state()=='edit'">
 	    <input class="input-block-level" type="text"
-		   data-bind="value: name"/>
+		   data-bind="value: name, valueUpdate: 'keyup'"/>
 	    <div class="well">
 	      <div data-bind="foreach: phones">
 		<div class="controls controls-row">
@@ -92,15 +92,19 @@
 	      <p class="controls"></p>
 
 	      <div class="controls controls-row" data-bind="with: $root.info.newPhone">
-		<input class="span8" type="text" data-bind="value: number" placeholder="3-14-159-2653..."/>
-		<button class="btn span2" data-bind="click: $root.info.addPhone">
+		<input class="span8" type="text" data-bind="value: number,
+							    valueUpdate: 'keyup'"
+		       placeholder="3-14-159-2653..."/>
+		<button class="btn span2"
+			data-bind="click: $root.info.addPhone, enable: number().length>0">
 		  <i class="icon-plus"></i>
 		</button>
 	      </div>
 	    </div>
 
 	    <div class="form-actions">
-	      <button class="btn" data-bind="click: $root.info.editDone">Done <i class="icon-ok"></i></button>
+	      <button class="btn"
+		      data-bind="click: $root.info.editDone, enable: name().length>0">Done <i class="icon-ok"></i></button>
 	      <button class="btn pull-right btn-danger"
 		      data-bind="click: $root.delPerson">
 		<i class="icon-fire icon-white"></i>
