@@ -4,7 +4,7 @@ var Phone = (function () {
     }
     return Phone;
 })();
-phone = function (num) {
+var phone = function (num) {
     return new Phone(num);
 };
 var Person = (function () {
@@ -18,11 +18,11 @@ var Person = (function () {
 var HeadlessAPI = (function () {
     function HeadlessAPI() {
         this.data = [
-            new Person('0', 'Dr Robert', [
+            new Person(0, 'Dr Robert', [
                 phone('000'), 
                 phone('111-222-333')
             ]), 
-            new Person('1', 'Ms Z', [
+            new Person(1, 'Ms Z', [
                 phone('+7 (908) 36-77-123')
             ])
         ];
@@ -30,7 +30,7 @@ var HeadlessAPI = (function () {
     HeadlessAPI.prototype.person_list = function () {
         return this.data;
     };
-    HeadlessAPI.prototype.add_person = function (p) {
+    HeadlessAPI.prototype.create_person = function (p) {
         return p;
     };
     HeadlessAPI.prototype.delete_person = function (p) {
@@ -39,11 +39,6 @@ var HeadlessAPI = (function () {
     };
     return HeadlessAPI;
 })();
-var Data = (function () {
-    function Data() { }
-    return Data;
-})();
-;
 var AjaxAPI = (function () {
     function AjaxAPI() {
         $.ajaxSetup({
@@ -53,25 +48,32 @@ var AjaxAPI = (function () {
             async: false
         });
     }
-    AjaxAPI.prototype.req = function (url, meth, data) {
-        console.log('data', data, JSON.stringify(data));
-        var req = $.ajax(url, {
-            type: meth,
-            data: JSON.stringify(data)
-        });
-        var ps = $.parseJSON(req.responseText);
-        return ps;
+    AjaxAPI.prototype.req = function (meth, id, data) {
+        var url = '/api/people/' + id;
+        var opts = {
+            type: meth
+        };
+        if(data) {
+            opts.data = JSON.stringify(data);
+        }
+        var req = $.ajax(url, opts);
+        return $.parseJSON(req.responseText);
     };
     AjaxAPI.prototype.person_list = function () {
-        return this.req('/api/people/*', 'GET');
+        console.log('api list');
+        return this.req('GET', '*');
     };
-    AjaxAPI.prototype.add_person = function (p) {
-        return p;
+    AjaxAPI.prototype.create_person = function (p) {
+        console.log('api add', p);
+        return this.req('POST', '_', p);
     };
     AjaxAPI.prototype.delete_person = function (p) {
+        console.log('api del', p);
+        this.req('DELETE', p.id.toString());
     };
     AjaxAPI.prototype.update_person = function (p) {
-        this.req('/api/people/' + p.id(), 'PUT', ko.mapping.toJS(p));
+        console.log('api upd', p);
+        this.req('PUT', p.id.toString(), p);
     };
     return AjaxAPI;
 })();
