@@ -5,6 +5,7 @@ use Modern::Perl;
 use Moose;
 use MooseX::NonMoose;
 use MooseX::MarkAsMethods autoclean => 1;
+use MooseX::Storage;
 extends 'DBIx::Class::Core';
 
 use DBIx::Class::MooseColumns;
@@ -12,35 +13,26 @@ use DBIx::Class::MooseColumns;
 __PACKAGE__->table('phonebook');
 __PACKAGE__->load_components('InflateColumn::Serializer', 'Core');
 
-has id => (isa => 'Int', is => 'rw', add_column => { is_auto_increment => 1 });
+has id => (isa => 'Int',
+	   is => 'rw',
+	   required => 1,
+	   add_column => { data_type => 'int', unique => 1, is_auto_increment => 1 });
 
 __PACKAGE__->set_primary_key('id');
 
 
-has name => (
-    isa => 'Str',
-    is => 'rw',
-    add_column => { data_type => 'text' }
-);
+has name => (isa => 'Str',
+	     is => 'rw',
+	     required => 1,
+	     add_column => { data_type => 'text' });
 
-has phones => (
-    isa => 'ArrayRef[Str]',
-    is => 'rw',
-    add_column => { data_type => 'text', serializer_class => 'JSON' }
-);
+has phones => (isa => 'ArrayRef[HashRef[Str]]',
+	       is => 'rw',
+	       required => 1,
+	       add_column => { data_type => 'text', serializer_class => 'JSON' });
 
 
-
-sub to_hashref {
-  my ($self) = @_;
-
-  say 'REF ', join '|', $self->get_inflated_columns;
-
-  my $r = {id => $self->id, name => $self->name };
-  $r->{phones} = $self->phones if defined $self->phones;
-
-  return $r;
-}
+sub to_hashref { +{ $_[0]->get_inflated_columns } }
 
 
 

@@ -4,12 +4,13 @@
 /// <reference path="core.ts" />
 
 
+declare var phone: (string) => any;
 
-var api = new AjaxAPI();
+var api;
 
 class Info
 {
-  newPhone = ko.mapping.fromJS(new Phone(''));
+  newPhone = ko.observable(phone(''));
 
   changeState: () => void;
   state = ko.observable('view');
@@ -28,15 +29,16 @@ class Info
       view.currentPerson().phones.remove(p);
     }
 
-    this.addPhone = (p: Phone) => {
-      view.currentPerson().phones.push(ko.mapping.toJS(p));
-      this.newPhone.number('');
+    this.addPhone = (_: Phone) => {
+      view.currentPerson().phones.push(this.newPhone());
+      this.newPhone('');
     }
 
     this.editDone = (p) => {
-      console.log(p.id(), p.name());
-      //xxx update
-      this.state('view');
+      api.update_person(p); 
+      view.sync();
+      view.select(p);
+      console.log('done?');
     };
   }
 }
@@ -52,14 +54,17 @@ class View
 
   info: Info;
 
+  sync () { console.log('sync'); ko.mapping.fromJS(api.person_list(), this.people); }
+
 
   constructor
   {
-    this.info = new Info(this);
+    console.log(api.person_list());
 
     this.select = (p) => {
       var editable = ko.mapping.toJS(p);
       this.currentPerson(ko.mapping.fromJS(editable));
+      this.info = new Info(this);
     };
 
     this.addPerson = (p) => {
@@ -67,7 +72,7 @@ class View
 
     this.delPerson = (p) => {
       console.log('del', p);
-      api.deletePerson(p.id);
+      api.delete_person(p.id);
     }
 
     if (this.people().length > 0)
@@ -80,6 +85,8 @@ class UI
 {
   constructor
   {
+    api = new AjaxAPI();
+    console.log('~', api.person_list());
     ko.applyBindings(new View());
   }
 }
