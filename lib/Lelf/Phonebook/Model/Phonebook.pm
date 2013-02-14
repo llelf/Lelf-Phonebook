@@ -24,34 +24,34 @@ sub ppl { $_[0]->resultset('Phonebook') }
 
 
 sub valid_person {
-  my ($p) = @_;
-  return 1;
+  my ($self, $p) = @_;
+  eval { $self->ppl->new($p) };
 }
 
 sub people_names {
     my ($self) = @_;
-    return $self->ppl->search({}, { columns => [qw{id name}] })->all;
+    $self->ppl->search({}, { columns => [qw{id name}] })->all;
 }
 
 sub find_person {
-  my ($self, $id) = @_;
-  $self->ppl->find($id);
+    my ($self, $id) = @_;
+    $self->ppl->find($id);
 }
 
 sub create_person {
-  my ($self, $p) = @_;
-  eval { $self->ppl->create($p) };
+    my ($self, $p) = @_;
+    delete $p->{id};
+    eval { $self->ppl->create($p) };
 }
 
 sub update_person {
-  my ($self, $p) = @_;
-  say values %$p;
-  $self->ppl->find($p->{id})->update($p);
+    my ($self, $p) = @_;
+    eval { $self->ppl->find($p->{id})->update($p) };
 }
 
 sub delete_person {
   my ($self, $id) = @_;
-  eval { $self->ppl->delete($id) };
+  eval { $self->ppl->find($id)->delete };
 }
 
 

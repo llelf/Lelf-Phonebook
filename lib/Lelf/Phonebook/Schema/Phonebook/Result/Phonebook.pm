@@ -5,17 +5,16 @@ use Modern::Perl;
 use Moose;
 use MooseX::NonMoose;
 use MooseX::MarkAsMethods autoclean => 1;
-use MooseX::Storage;
-extends 'DBIx::Class::Core';
-
 use DBIx::Class::MooseColumns;
 
-__PACKAGE__->table('phonebook');
+extends 'DBIx::Class::Core';
+
+
+__PACKAGE__->table('people');
 __PACKAGE__->load_components('InflateColumn::Serializer', 'Core');
 
 has id => (isa => 'Int',
 	   is => 'rw',
-	   required => 1,
 	   add_column => { data_type => 'int', unique => 1, is_auto_increment => 1 });
 
 __PACKAGE__->set_primary_key('id');
@@ -33,7 +32,6 @@ has phones => (isa => 'ArrayRef[HashRef[Str]]',
 
 
 sub to_hashref { +{ $_[0]->get_inflated_columns } }
-
 
 
 

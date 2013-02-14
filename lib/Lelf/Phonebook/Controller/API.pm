@@ -5,76 +5,71 @@ use namespace::autoclean;
 use Modern::Perl;
 
 use CatalystX::Controller::Sugar;
-use syntax 'catalyst_action';
-use CatalystX::Declare;
+use syntax qw{method catalyst_action};
 
-BEGIN { extends 'Catalyst::Controller::REST' };
+extends 'Catalyst::Controller::REST';
 
-use constant { OK=>1, ERROR=>2 };
-
-action boo :Path('eeee') {
-}
+use constant { OK=>1, ERROR=>2, ERROR_INVALID_INPUT=>3 };
 
 
-sub auto :Private {
-    my ($self, $c) = @_;
-    stash book => $c->model('Phonebook');
-}
+after begin => sub {
+    my ($self,$ctx) = @_;
+    stash book => $ctx->model('Phonebook');
+};
 
 
+action people ($id) :Args(1) :Local {
+    stash id => $id;
 
-chain '/' => 'api/people' => ['id'] => sub {
     my $action;
-    
-    say 'id=', captured 'id';
-    # say req 'method' ~~ 'GET';
-    # say '*' ~~ captured 'id';
 
-
-    given (req->{method}) {
-	when (/GET/ && ('*' ~~ '*')) { $action = 'people_get_all' }
-	when (/GET/) { $action = 'people_get' }
-	when (/POST/) { $action = 'people_create' }
+    given ($ctx->req->{method}) {
+	when (/GET/ && $id ~~ '*') { $action = 'people_get_all' }
+	when (/GET/) { $action = 'get_person' }
+	when (/POST/) { $action = 'create_person' }
 	when (/PUT/) { $action = 'update_person' }
-	when (/DELETE/) { $action = 'people_delete' }
-	default { say 'M=', req->{method}; $action = 'xxxxxx' }
+	when (/DELETE/) { $action = 'delete_person' }
     }
 
-    say "GO TO $action";
-    go $action;
-};
-
-chain 'people_ops' => sub {
+    my $fun = $ctx->controller->action_for($action);
+    report debug => 'action=' . $fun // '<???>';
+    #report debug => $ctx->req->{data};
+    $ctx->log->_dump($ctx->req->{data});
     
+    $ctx->forward('validate', $fun->attributes->{ID})
+	or stash status => ERROR_INVALID_INPUT and $ctx->go('end')
+	if $fun->attributes->{Validate};
+
+    $ctx->go($fun) if $fun;
+}
+
+
+action validate ($id_known) :Action {
+    # ...
+    return unless ref($ctx->req->{data}) eq 'HASH';
+    stash validated => 1;
 };
 
-sub people_get_all :Action {
-    stash persons => [ stash->{book}->ppl->all ]
+
+action people_get_all :Action {
+    stash persons => [ stash->{book}->ppl->all ];
 }
 
-sub get_person { 
-    stash person => stash->{book}->ppl->find(captured 'id')
+action get_person :Action :ID { 
+    stash person => stash->{book}->find_person(stash->{id});
 }
 
-sub update_person :Action {
-    say 'DATA=', %{req 'data'};
-    stash person => stash->{book}->update_person(req->{data});
+action update_person :Action :Validate :ID {
+    stash person => stash->{book}->update_person($ctx->req->{data});
 }
 
-sub create_person {
-    stash person => stash->{book}->create_person(req 'data');
+action create_person :Action :Validate {
+    stash person => stash->{book}->create_person($ctx->req->{data});
 }
 
-sub delete_person {
-    stash status => stash->{book}->delete_person(captured 'id') ? OK : ERROR;
+action delete_person :Action :ID {
+    stash status => stash->{book}->delete_person(stash->{id}) ? OK : ERROR;
 }
-
-
-
-chain 'people:1' => '' => sub { say 'PEND' };
-
-
-
 
 
 before end => sub {
@@ -82,13 +77,10 @@ before end => sub {
 
     given ($c->{stash}) {
 	when ('person' ~~ $_) {
-	    my $p = stash 'person';
-	    $self->status_ok($c, entity => $p ? $p->to_hashref : []);
+	    $self->status_ok($c, entity => stash->{person}->to_hashref);
 	}
 
 	when ('persons' ~~ $_) {
-	    say '+has result';
-	    $c->log->_dump(stash->{persons}->[0]->to_hashref);
 	    $self->status_ok($c, entity => [ map { $_->to_hashref } @{stash 'persons'} ]);
 	}
 
@@ -97,20 +89,15 @@ before end => sub {
 	}
 
 	default {
+	    report info => 'bad news';
 	    $c->response->status((400 .. 500)[int rand 19]);
-	    $c->stash(rest => { oops => "Error #@{[ int rand 100_000 ]}" });
+	    $c->stash(rest => { oops => "Error #@{[ int rand 100_000 ]}, status=@{[ $_->{status} // '?' ]}" });
 	}
     }
 };
 
 
 
-
-=head1 AUTHOR
-
-Anton Nikishaev
-
-=cut
 
 __PACKAGE__->meta->make_immutable;
 
