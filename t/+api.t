@@ -3,11 +3,13 @@
 use Modern::Perl;
 use JSON;
 use Furl;
-use Catalyst::Test 'Lelf::Phonebook';
 use Test::More;
 
-$ENV{DB_MODIFY_TESTS} // plan skip_all => 'to run set env var DB_MODIFY_TESTS';
+$ENV{DB_MODIFY_TESTS}
+  // plan skip_all => 'to run set env var DB_MODIFY_TESTS';
 
+$ENV{CATALYST_REMOTE}
+  // plan skip_all => 'to tun set env var CATALYST_REMOTE (e.g. http://localhost:3000)';
 
 
 my $furl = Furl->new(agent => '-api.t',
@@ -18,8 +20,7 @@ my $json = JSON->new->allow_nonref;
 sub req {
     my ($meth, $path, $data) = @_;
 
-    my $host = 'http://localhost:3000';
-    $furl->request(url => $host . $path,
+    $furl->request(url => $ENV{CATALYST_REMOTE} . $path,
 		   method => $meth // 'GET',
 		   content => $data);
 }
