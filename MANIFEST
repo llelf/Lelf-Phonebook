@@ -17,6 +17,8 @@ inc/Module/Install/WriteAll.pm
 lelf_phonebook.conf
 lelf_phonebook.psgi
 lib/Lelf/Phonebook.pm
+lib/Lelf/Phonebook.pm-
+lib/Lelf/Phonebook/Controller/API-d.pm-
 lib/Lelf/Phonebook/Controller/API.pm
 lib/Lelf/Phonebook/Controller/Root.pm
 lib/Lelf/Phonebook/Model/Phonebook.pm
@@ -52,9 +54,8 @@ script/lelf_phonebook_create.pl
 script/lelf_phonebook_fastcgi.pl
 script/lelf_phonebook_server.pl
 script/lelf_phonebook_test.pl
+t/+api.t
 t/01app.t
 t/02pod.t
 t/03podcoverage.t
-t/controller_API.t
-t/controller_Lelf-Phonebook-API.t
 t/model_Phonebook.t
