@@ -36,7 +36,7 @@ sub people_names {
 
 sub find_person {
     my ($self, $id) = @_;
-    $self->ppl->find($id);
+    eval { $self->ppl->find($id) };
 }
 
 sub create_person {

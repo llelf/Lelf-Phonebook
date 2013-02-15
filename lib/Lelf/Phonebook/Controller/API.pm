@@ -78,11 +78,12 @@ before end => sub {
     my ($self, $c) = @_;
 
     given ($c->{stash}) {
-	when ('person' ~~ $_) {
+	when (not $_->{person} ~~ undef) {
+	    say 'person=', defined stash->{person};
 	    $self->status_ok($c, entity => stash->{person}->to_hashref);
 	}
 
-	when ('persons' ~~ $_) {
+	when (not $_->{persons} ~~ undef) {
 	    $self->status_ok($c, entity => [ map { $_->to_hashref } @{stash 'persons'} ]);
 	}
 
