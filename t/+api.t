@@ -3,6 +3,7 @@
 use Modern::Perl;
 use JSON;
 use Furl;
+use Catalyst::Test 'Lelf::Phonebook';
 use Test::More;
 
 $ENV{DB_MODIFY_TESTS} // plan skip_all => 'to run set env var DB_MODIFY_TESTS';
@@ -23,7 +24,7 @@ sub req {
 		   content => $data);
 }
 
-my ($env, $resp);
+our ($env, $resp);
 
 sub test {
     local $resp;
@@ -58,9 +59,8 @@ sub json_ok {
     t('json-ok'); $resp->{content} eq '' or $env->{data};
 }
 
-sub status_ok {
-    t('status-ok'); $resp->status == 200;
-}
+sub status_ok { t('status-ok'); $resp->status == 200 }
+sub status_not_ok { t('status-not-ok'); $resp->status != 200 }
 
 sub get_id {
     t('get-id'); $env->{id} = $env->{data}{id};
@@ -72,13 +72,13 @@ my $p1 = '{"id":0,"name":"mr X","phones":[]}';
 my $p2 = '{"id"::id,"name":"dr Y","phones":[{"number":"123-456-789"}]}';
 
 test [ GET => '/api/people/*' ],
-    => \&status_ok, \&json_ok
+    => \&status_ok, \&json_ok,
     
     [ GET => '/api/people/!!!' ]
     => \&status_not_ok,
 
     [ POST => '/api/people/_' => $p1 ],
-    => \&status_ok, \&json_ok, \&get_id
+    => \&status_ok, \&json_ok, \&get_id,
 
     [ GET => '/api/people/:id' ]
     => \&status_ok, \&json_ok, sub { $env->{data}{name} ~~ 'mr X' },
@@ -94,9 +94,10 @@ test [ GET => '/api/people/*' ],
     => \&status_ok,
 
     [ PUT => '/api/people/:id' => $p2 ]
+    => \&status_not_ok,
 
     [ GET => '/api/people/:id' ],
-    => status_not_ok;
+    => \&status_not_ok;
     
 
 done_testing;
