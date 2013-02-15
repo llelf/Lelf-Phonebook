@@ -27,6 +27,7 @@ requires 'MooseX::NonMoose';
 requires 'MooseX::MarkAsMethods';
 requires 'DBIx::Class::MooseColumns';
 requires 'DBIx::Class::InflateColumn::Serializer';
+requires 'Catalyst::Model::DBIC::Schema';
 test_requires 'Test::More' => '0.88';
 catalyst;
 
