@@ -15,6 +15,7 @@ __PACKAGE__->config(
         dsn => 'dbi:SQLite:phonebook.db',
         user => '',
         password => '',
+	sqlite_unicode => 1
     }
 );
 

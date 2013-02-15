@@ -1,5 +1,7 @@
 package Lelf::Phonebook::Controller::API;
 
+use utf8;
+use encoding 'utf-8';
 use Moose;
 use namespace::autoclean;
 use Modern::Perl;

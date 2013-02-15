@@ -42,7 +42,7 @@ var HeadlessAPI = (function () {
 var AjaxAPI = (function () {
     function AjaxAPI() {
         $.ajaxSetup({
-            contentType: 'application/json',
+            contentType: 'application/json, charset=utf-8',
             dataType: 'json',
             processData: false,
             async: false

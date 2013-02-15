@@ -43,7 +43,7 @@ class HeadlessAPI implements API
 class AjaxAPI implements API
 {
   constructor {
-    $.ajaxSetup({ contentType: 'application/json',
+    $.ajaxSetup({ contentType: 'application/json, charset=utf-8',
 		  dataType: 'json',
 		  processData: false,
 		  async: false });
