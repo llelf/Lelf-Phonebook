@@ -34,10 +34,9 @@ action people ($id) :Args(1) :Local {
     }
 
     my $fun = $ctx->controller->action_for($action);
-    report debug => 'action=' . $fun // '<???>';
-    #report debug => $ctx->req->{data};
-    $ctx->log->_dump($ctx->req->{data});
-    
+    report debug => 'action=%s', $fun && $fun->name;
+    report debug => "data=%s", $ctx->req->{data};
+
     $ctx->forward('validate', $fun->attributes->{ID})
 	or stash status => ERROR_INVALID_INPUT and $ctx->go('end')
 	if $fun->attributes->{Validate};
