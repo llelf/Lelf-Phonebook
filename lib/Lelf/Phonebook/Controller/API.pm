@@ -54,7 +54,7 @@ action validate ($id_known) :Action {
 
 
 action people_get_all :Action {
-    stash persons => [ stash->{book}->ppl->all ];
+    stash persons => [ stash->{book}->all_people_sorted ];
 }
 
 action get_person :Action :ID { 

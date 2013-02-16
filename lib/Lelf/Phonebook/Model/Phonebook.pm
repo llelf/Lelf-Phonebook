@@ -25,13 +25,18 @@ sub ppl { $_[0]->resultset('Phonebook') }
 
 
 sub valid_person {
-  my ($self, $p) = @_;
-  eval { $self->ppl->new($p) };
+    my ($self, $p) = @_;
+    eval { $self->ppl->new($p) };
 }
 
 sub people_names {
     my ($self) = @_;
     $self->ppl->search({}, { columns => [qw{id name}] })->all;
+}
+
+sub all_people_sorted {
+  my ($self) = @_;
+  $self->ppl->search(undef, { order_by => 'name'})->all;
 }
 
 sub find_person {
