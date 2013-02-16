@@ -29,6 +29,7 @@ MANIFEST			This list of files
 META.yml
 phonebook.db
 README
+root/ass/Makefile
 root/ass/css/bootstrap-responsive.css
 root/ass/css/bootstrap-responsive.min.css
 root/ass/css/bootstrap.css
