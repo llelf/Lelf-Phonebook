@@ -36,7 +36,7 @@ sub people_names {
 
 sub all_people_sorted {
   my ($self) = @_;
-  $self->ppl->search(undef, { order_by => 'name'})->all;
+  $self->ppl->search(undef, { order_by => \q{name COLLATE NOCASE}})->all;
 }
 
 sub find_person {
