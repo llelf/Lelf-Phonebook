@@ -4,6 +4,7 @@ use Modern::Perl;
 use JSON;
 use Furl;
 use Test::More;
+use encoding 'utf-8';
 
 $ENV{DB_MODIFY_TESTS}
   // plan skip_all => 'to run set env var DB_MODIFY_TESTS';
@@ -69,8 +70,9 @@ sub get_id {
 
 sub test;
 
+
 my $p1 = '{"id":0,"name":"mr X","phones":[]}';
-my $p2 = '{"id"::id,"name":"dr Y","phones":[{"number":"123-456-789"}]}';
+my $p2 = '{"id"::id,"name":"dr 🐰","phones":[{"number":"123-456-789"}]}';
 
 test [ GET => '/api/people/*' ],
     => \&status_ok, \&json_ok,
@@ -88,8 +90,8 @@ test [ GET => '/api/people/*' ],
     => \&status_not_ok,
 
     [ PUT => '/api/people/:id' => $p2 ]
-    => \&status_ok, \&json_ok, sub { $env->{data}{name} ~~ 'dr Y' 
-					    and $env->{data}{phones}[0]{number} ~~ '123-456-789' },
+    => \&status_ok, \&json_ok, sub { $env->{data}{phones}[0]{number} ~~ '123-456-789' },
+       sub { t('unicode'); length $env->{data}{name} == 4 },
 
     [ DELETE => '/api/people/:id' ],
     => \&status_ok,
