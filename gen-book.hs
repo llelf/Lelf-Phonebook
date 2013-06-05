@@ -39,7 +39,7 @@ toInsert (Person (Name name) phones) =
               quote x = "[" ++ x ++ "]"
 
 
-main = do people <- sample' arbitrary >>= sequence
+main = do people <- sample' >=> sequence $ arbitrary
           putStrLn . unlines $ [ toInsert p | p <- people ]
 
 
