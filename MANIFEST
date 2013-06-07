@@ -29,7 +29,6 @@ MANIFEST			This list of files
 META.yml
 phonebook.db
 README
-root/ass/Makefile
 root/ass/css/bootstrap-responsive.css
 root/ass/css/bootstrap-responsive.min.css
 root/ass/css/bootstrap.css
@@ -42,6 +41,7 @@ root/ass/js/jquery-1.9.1.min.js
 root/ass/js/knockout-2.2.1.js
 root/ass/js/knockout.mapping-latest.debug.js
 root/ass/js/knockout.mapping-latest.js
+root/Makefile
 root/core.js
 root/core.ts
 root/index.html
