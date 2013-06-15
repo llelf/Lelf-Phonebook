@@ -6,8 +6,7 @@ use Moose;
 use namespace::autoclean;
 use Modern::Perl;
 
-use CatalystX::Controller::Sugar;
-use syntax qw{method catalyst_action};
+use syntax qw{method};
 
 extends 'Catalyst::Controller::REST';
 
@@ -15,13 +14,13 @@ use constant { OK=>1, ERROR=>2, ERROR_INVALID_INPUT=>3 };
 
 
 after begin => sub {
-    my ($self,$ctx) = @_;
-    stash book => $ctx->model('Phonebook');
+    my ($self, $ctx) = @_;
+    $ctx->stash(book => $ctx->model('Phonebook'));
 };
 
 
-action people ($id) :Args(1) :Local {
-    stash id => $id;
+method people ($ctx, $id) :Args(1) :Local {
+    $ctx->stash(id => $id);
 
     my $action;
 
@@ -34,66 +33,68 @@ action people ($id) :Args(1) :Local {
     }
 
     my $fun = $ctx->controller->action_for($action);
-    report debug => 'action=%s', $fun && $fun->name;
-    report debug => "data=%s", $ctx->req->{data};
+#    report debug => 'action=%s', $fun && $fun->name;
+#    report debug => "data=%s", $ctx->req->{data};
 
     $ctx->forward('validate', $fun->attributes->{ID})
-	or stash status => ERROR_INVALID_INPUT and $ctx->go('end')
-	if $fun->attributes->{Validate};
+    	or $ctx->stash(status => ERROR_INVALID_INPUT) and $ctx->go('end')
+    	if $fun->attributes->{Validate};
 
     $ctx->go($fun) if $fun;
 }
 
 
-action validate ($id_known) :Action {
+method validate ($ctx, $id_known) :Action {
     # ...
     return unless ref($ctx->req->{data}) eq 'HASH';
-    stash validated => 1;
+    $ctx->stash(validated => 1);
 };
 
 
-action people_get_all :Action {
-    stash persons => [ stash->{book}->all_people_sorted ];
+method people_get_all ($ctx) :Action {
+    $ctx->stash(persons => [ $ctx->stash->{book}->all_people_sorted ]);
 }
 
-action get_person :Action :ID { 
-    stash person => stash->{book}->find_person(stash->{id});
+method get_person ($ctx) :Action :ID {
+    $ctx->stash(person => $ctx->stash->{book}->find_person($ctx->stash->{id}));
 }
 
-action update_person :Action :Validate :ID {
-    stash person => stash->{book}->update_person($ctx->req->{data});
+method update_person ($ctx) :Action :Validate :ID {
+    $ctx->stash(person => $ctx->stash->{book}->update_person($ctx->req->{data}));
 }
 
-action create_person :Action :Validate {
-    stash person => stash->{book}->create_person($ctx->req->{data});
+method create_person ($ctx) :Action :Validate {
+    $ctx->stash(person => $ctx->stash->{book}->create_person($ctx->req->{data}));
 }
 
-action delete_person :Action :ID {
-    stash status => stash->{book}->delete_person(stash->{id}) ? OK : ERROR;
+method delete_person ($ctx) :Action :ID {
+    $ctx->stash(status => $ctx->stash->{book}->delete_person($ctx->stash->{id}) ? OK : ERROR);
 }
 
 
 before end => sub {
-    my ($self, $c) = @_;
+    my ($self, $ctx) = @_;
 
-    given ($c->{stash}) {
+    given ($ctx->{stash}) {
 	when (not $_->{person} ~~ undef) {
-	    say 'person=', defined stash->{person};
-	    $self->status_ok($c, entity => stash->{person}->to_hashref);
+#	    say 'person=', defined stash->{person};
+	    $self->status_ok($ctx, entity => $ctx->stash->{person}->to_hashref);
 	}
 
-	when (not $_->{persons} ~~ undef) {
-	    $self->status_ok($c, entity => [ map { $_->to_hashref } @{stash 'persons'} ]);
+	when ($_->{persons} ~~ undef) {
+	    $self->status_ok($ctx, entity => [ map { $_->to_hashref } @{$ctx->stash->{persons}} ]);
 	}
 
 	when ($_->{status} ~~ OK) {
-	    $self->status_ok($c, entity => []);
+	    $self->status_ok($ctx, entity => []);
 	}
 
 	default {
-	    report info => 'bad news';
-	    $c->response->status((400 .. 500)[int rand 19]);
-	    $c->stash(rest => { oops => "Error #@{[ int rand 100_000 ]}, status=@{[ $_->{status} // '?' ]}" });
+#	    report info => 'bad news';
+	    $ctx->response->status((400 .. 500)[int rand 19]);
+	    $ctx->stash(rest => {
+		oops => "Error #@{[ int rand 100_000 ]}, status=@{[ $_->{status} // '?' ]}"
+		      });
 	}
     }
 };
