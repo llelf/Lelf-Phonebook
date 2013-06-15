@@ -9,7 +9,8 @@ use Modern::Perl;
 use syntax qw{method};
 no if $] >= 5.018, warnings => 'experimental::smartmatch';
 
-extends 'Catalyst::Controller::REST';
+BEGIN { extends 'Catalyst::Controller::REST' };
+
 
 use constant { OK=>1, ERROR=>2, ERROR_INVALID_INPUT=>3 };
 
