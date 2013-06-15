@@ -83,7 +83,7 @@ before end => sub {
 	    $self->status_ok($ctx, entity => $ctx->stash->{person}->to_hashref);
 	}
 
-	when ($_->{persons} ~~ undef) {
+	when (not $_->{persons} ~~ undef) {
 	    $self->status_ok($ctx, entity => [ map { $_->to_hashref } @{$ctx->stash->{persons}} ]);
 	}
 
