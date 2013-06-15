@@ -7,6 +7,7 @@ use namespace::autoclean;
 use Modern::Perl;
 
 use syntax qw{method};
+no if $] >= 5.018, warnings => 'experimental::smartmatch';
 
 extends 'Catalyst::Controller::REST';
 
